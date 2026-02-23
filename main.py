@@ -42,10 +42,7 @@ class Battery:
 
         return actual_power_kW
 
-MAX_LOAD_kW = 300
-season, mkt_prices_csv = Seasons.AUTUMN.value
-
-def prepare_load_profile(peak_load=MAX_LOAD_kW, dataset="datasets/ProfileClass5.csv"):
+def prepare_load_profile(peak_load, dataset="datasets/ProfileClass5.csv"):
     load_profile = pd.read_csv(dataset)
     load_profile["SettlementPeriod"] = load_profile.index + 1
     load_coefficients = load_profile.columns.difference(["Time", "SettlementPeriod"])
@@ -71,7 +68,7 @@ def prepare_load_profile(peak_load=MAX_LOAD_kW, dataset="datasets/ProfileClass5.
 
     return load_profile
 
-def prepare_mkt_prices(dataset=mkt_prices_csv):
+def prepare_mkt_prices(dataset):
     mkt_prices = pd.read_csv(dataset)
 
     mkt_prices = mkt_prices[mkt_prices["DataProvider"] == "APXMIDP"]
@@ -215,11 +212,13 @@ def run_model(dataset_bad_name):
 if __name__ == "__main__":
     summary = []
 
-    load_profile = prepare_load_profile()
+    load_profile = prepare_load_profile(peak_load=300)
 
     for season in Seasons:
-        mkt_prices = prepare_mkt_prices(season.value[1])
-        px_usage_sp = generate_usage_per_sp(load_profile, mkt_prices, season.value[0])
+        season_abr, mkt_px_dataset = season.value
+
+        mkt_prices = prepare_mkt_prices(mkt_px_dataset)
+        px_usage_sp = generate_usage_per_sp(load_profile, mkt_prices, season_abr)
         final_df = run_model(px_usage_sp)
 
         summary.append({
