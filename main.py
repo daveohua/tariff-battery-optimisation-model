@@ -209,10 +209,10 @@ def run_model(dataset_bad_name):
     battery_state_df = pd.DataFrame(battery_state)
     return battery_state_df
 
-def process_all_seasons():
+def process_all_seasons(peak_load=150):
     dfs = {}
 
-    load_profile = prepare_load_profile(peak_load=150)
+    load_profile = prepare_load_profile(peak_load)
 
     for season in Seasons:
         season_abr, mkt_px_dataset = season.value
