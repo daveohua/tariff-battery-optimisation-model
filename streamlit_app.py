@@ -58,25 +58,13 @@ week_dynamic_gbp = gbp(df["WholesaleNoBatteryCost_p"].sum())
 week_dynamic_batt_gbp = gbp(df["NetCost_p"].sum())
 
 # ---------- Top KPIs ----------
-c1, c2, c3, c4 = st.columns(4)
+c1, c2, c3, c4, c5, c6 = st.columns(6)
 c1.metric("Fixed tariff (week)", f"£{week_fixed_gbp:,.0f}")
 c2.metric("Dynamic tariff (week)", f"£{week_dynamic_gbp:,.0f}", delta=f"£{(week_fixed_gbp-week_dynamic_gbp):,.0f}")
 c3.metric("Dynamic + battery (week)", f"£{week_dynamic_batt_gbp:,.0f}", delta=f"£{(week_dynamic_gbp-week_dynamic_batt_gbp):,.0f}")
 c4.metric("Total savings (week)", f"£{(week_fixed_gbp-week_dynamic_batt_gbp):,.0f}")
-
-st.divider()
-
-# ---------- “Journey” breakdown ----------
-st.subheader("Savings breakdown (selected season week)")
-tariff_only = week_fixed_gbp - week_dynamic_gbp
-battery_only = week_dynamic_gbp - week_dynamic_batt_gbp
-
-breakdown = pd.DataFrame({
-    "Stage": ["Fixed → Dynamic (tariff)", "Dynamic → Dynamic+battery (battery)"],
-    "Savings_£": [tariff_only, battery_only],
-})
-
-st.bar_chart(breakdown.set_index("Stage"))
+c5.metric("Assumed peak usage", "300kW")
+c6.metric("Battery size", "260kWh")
 
 st.divider()
 
