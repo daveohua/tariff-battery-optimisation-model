@@ -69,16 +69,16 @@ c1.metric("Fixed tariff (year)", f"£{year_fixed_gbp:,.0f}")
 c2.metric("Dynamic tariff (year)", f"£{year_dynamic_gbp:,.0f}", delta=f"£{(year_fixed_gbp-year_dynamic_gbp):,.0f}")
 c3.metric("Dynamic + battery (year)", f"£{year_dynamic_batt_gbp:,.0f}", delta=f"£{(year_dynamic_gbp-year_dynamic_batt_gbp):,.0f}")
 c4.metric("Total savings (year)", f"£{(year_fixed_gbp-year_dynamic_batt_gbp):,.0f}")
-c5.metric("Assumed yearly peak demand", "150kW")
+c5.metric("Yearly peak demand", "150kW")
 c6.metric("Battery size", "260kWh")
 
 st.divider()
 
 c7, c8, c9, c10 = st.columns(4)
-c7.metric("Fixed tariff (week)", f"£{week_fixed_gbp:,.0f}")
-c8.metric("Dynamic tariff (week)", f"£{week_dynamic_gbp:,.0f}", delta=f"£{(week_fixed_gbp-week_dynamic_gbp):,.0f}")
-c9.metric("Dynamic + battery (week)", f"£{week_dynamic_batt_gbp:,.0f}", delta=f"£{(week_dynamic_gbp-week_dynamic_batt_gbp):,.0f}")
-c10.metric("Total savings (week)", f"£{(week_fixed_gbp-week_dynamic_batt_gbp):,.0f}")
+c7.metric(f"Fixed tariff (typical {season.lower()} week)", f"£{week_fixed_gbp:,.0f}")
+c8.metric(f"Dynamic tariff (typical {season.lower()} week)", f"£{week_dynamic_gbp:,.0f}", delta=f"£{(week_fixed_gbp-week_dynamic_gbp):,.0f}")
+c9.metric(f"Dynamic + battery (typical {season.lower()} week)", f"£{week_dynamic_batt_gbp:,.0f}", delta=f"£{(week_dynamic_gbp-week_dynamic_batt_gbp):,.0f}")
+c10.metric(f"Total savings (typical {season.lower()} week)", f"£{(week_fixed_gbp-week_dynamic_batt_gbp):,.0f}")
 
 st.divider()
 # ---------- Daily trace ----------
@@ -101,7 +101,7 @@ trace["BatteryPower_kW"] = trace["Charge_kW"] - trace["Discharge_kW"]
 left, right = st.columns([2, 1])
 
 st.line_chart(
-    trace.set_index("Time")[["Usage_kW", "GridImport_kW", "BatteryPower_kW"]]
+    trace.set_index("Time")[["Usage_kW", "GridImport_kW", "BatteryPower_kW", "SupplierImportPrice_p_kWh"]]
 )
 
 with st.expander("Show raw data"):
