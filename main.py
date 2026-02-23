@@ -99,7 +99,7 @@ def prepare_mkt_prices(dataset):
 
     return mkt_prices
 
-def generate_usage_per_sp(load_profile, mkt_prices, _season=season):
+def generate_usage_per_sp(load_profile, mkt_prices, _season):
     usage_sp = mkt_prices.merge(
         load_profile[["SettlementPeriod", f"{_season} Wd", f"{_season} Sat", f"{_season} Sun"]],
         on="SettlementPeriod",
@@ -223,12 +223,16 @@ if __name__ == "__main__":
 
         summary.append({
             "season": season.name,
-            "fixed_tariff": final_df["NetCost_p"].sum() / 100 * 13,
+            "tou_tariff_battery": final_df["NetCost_p"].sum() / 100 * 13,
             "tou_tariff": final_df["WholesaleNoBatteryCost_p"].sum() / 100 * 13,
-            "tou_tariff_battery": final_df["TariffNoBatteryCost_p"].sum() / 100 * 13
+            "fixed_tariff": final_df["TariffNoBatteryCost_p"].sum() / 100 * 13
         })
 
     summary_df = pd.DataFrame(summary)
     print(summary_df)
+    print(summary_df["fixed_tariff"].sum())
+    print(summary_df["tou_tariff"].sum())
+    print(summary_df["tou_tariff_battery"].sum())
+    print(summary_df["fixed_tariff"].sum() - summary_df["tou_tariff_battery"].sum())
 
     final_df.to_csv("temp/final_df.csv")
