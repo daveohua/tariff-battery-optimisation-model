@@ -87,20 +87,11 @@ trace["BatteryPower_kW"] = trace["Charge_kW"] - trace["Discharge_kW"]
 
 left, right = st.columns([2, 1])
 
-with left:
-    st.line_chart(
-        trace.set_index("Time")[["Usage_kW", "GridImport_kW", "BatteryPower_kW"]]
-    )
+st.line_chart(
+    trace.set_index("Time")[["Usage_kW", "GridImport_kW", "BatteryPower_kW"]]
+)
 
-with right:
-    st.write("Battery stats (day)")
-    st.metric("Min SOC (kWh)", f"{trace['SOC_kWh'].min():.1f}")
-    st.metric("Max SOC (kWh)", f"{trace['SOC_kWh'].max():.1f}")
-    st.metric("Total charge (kWh)", f"{(trace['Charge_kW'].sum() * 0.5):.0f}")
-    st.metric("Total discharge (kWh)", f"{(trace['Discharge_kW'].sum() * 0.5):.0f}")
-    st.metric("Peak import (kW)", f"{trace['GridImport_kW'].max():.0f}")
-
-with st.expander("Show raw day data"):
+with st.expander("Show raw data"):
     st.dataframe(day_df, use_container_width=True)
 
 st.divider()
