@@ -38,8 +38,8 @@ def gbp(x_pence: float) -> float:
 # }
 dfs = process_all_seasons()
 
-st.title("SME Battery Savings Simulator")
-st.caption("Fixed tariff → Dynamic tariff → Dynamic + battery (site-first dispatch)")
+st.title("Battery Savings Simulator")
+st.caption("How much can you save when you switch from a fixed tariff to a dynamic tariff with battery optimisation?")
 
 if not dfs:
     st.warning("Hook up your seasonal results dataframes (winter/spring/summer/autumn) in the `dfs` dict.")
@@ -81,8 +81,8 @@ week_dynamic_batt_gbp = gbp(df["NetCost_p"].sum())
 # ---------- Top KPIs ----------
 c1, c2, c3, c4, c5, c6 = st.columns(6)
 c1.metric("Fixed tariff (year)", f"£{year_fixed_gbp:,.0f}")
-c2.metric("Dynamic tariff (year)", f"£{year_dynamic_gbp:,.0f}", delta=f"£{(year_fixed_gbp-year_dynamic_gbp):,.0f}")
-c3.metric("Dynamic + battery (year)", f"£{year_dynamic_batt_gbp:,.0f}", delta=f"£{(year_dynamic_gbp-year_dynamic_batt_gbp):,.0f}")
+c2.metric("Dynamic tariff (year)", f"£{year_dynamic_gbp:,.0f}", delta=f"-£{(year_fixed_gbp-year_dynamic_gbp):,.0f}", delta_color="inverse")
+c3.metric("Dynamic + battery (year)", f"£{year_dynamic_batt_gbp:,.0f}", delta=f"-£{(year_fixed_gbp-year_dynamic_batt_gbp):,.0f}", delta_color="inverse")
 c4.metric("Total savings (year)", f"£{(year_fixed_gbp-year_dynamic_batt_gbp):,.0f}")
 c5.metric("Yearly peak demand", "150kW")
 c6.metric("Battery size", "260kWh")
@@ -91,8 +91,8 @@ st.divider()
 
 c7, c8, c9, c10 = st.columns(4)
 c7.metric(f"Fixed tariff (typical {season.lower()} week)", f"£{week_fixed_gbp:,.0f}")
-c8.metric(f"Dynamic tariff (typical {season.lower()} week)", f"£{week_dynamic_gbp:,.0f}", delta=f"£{(week_fixed_gbp-week_dynamic_gbp):,.0f}")
-c9.metric(f"Dynamic + battery (typical {season.lower()} week)", f"£{week_dynamic_batt_gbp:,.0f}", delta=f"£{(week_dynamic_gbp-week_dynamic_batt_gbp):,.0f}")
+c8.metric(f"Dynamic tariff (typical {season.lower()} week)", f"£{week_dynamic_gbp:,.0f}", delta=f"-£{(week_fixed_gbp-week_dynamic_gbp):,.0f}", delta_color="inverse")
+c9.metric(f"Dynamic + battery (typical {season.lower()} week)", f"£{week_dynamic_batt_gbp:,.0f}", delta=f"-£{(week_fixed_gbp-week_dynamic_batt_gbp):,.0f}", delta_color="inverse")
 c10.metric(f"Total savings (typical {season.lower()} week)", f"£{(week_fixed_gbp-week_dynamic_batt_gbp):,.0f}")
 
 st.divider()
@@ -123,6 +123,17 @@ y2_max = trace[price_cols].max().max()
 
 padding = (y2_max - y2_min) * 0.05
 y2_range = [y2_min - padding, y2_max + padding]
+
+consumption_cols = [
+    "Usage_kW",
+    "GridImport_kW"
+]
+
+y_min = trace[consumption_cols].min().min()
+y_max = trace[consumption_cols].max().max()
+
+padding = (y_max - y_min) * 0.05
+y_range = [y_min - padding, y_max + padding]
 
 trace = trace.set_index("Time")
 
@@ -168,7 +179,7 @@ if plan != "Fixed":
 # Layout with dual axes
 fig.update_layout(
     xaxis=dict(title="Time"),
-    yaxis=dict(title="Usage (kW)", showgrid=False),
+    yaxis=dict(title="Usage (kW)", range = y_range, showgrid=False),
     yaxis2=dict(
         title="Price (p/kWh)",
         overlaying="y",
