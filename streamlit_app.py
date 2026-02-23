@@ -63,7 +63,7 @@ c1.metric("Fixed tariff (week)", f"£{week_fixed_gbp:,.0f}")
 c2.metric("Dynamic tariff (week)", f"£{week_dynamic_gbp:,.0f}", delta=f"£{(week_fixed_gbp-week_dynamic_gbp):,.0f}")
 c3.metric("Dynamic + battery (week)", f"£{week_dynamic_batt_gbp:,.0f}", delta=f"£{(week_dynamic_gbp-week_dynamic_batt_gbp):,.0f}")
 c4.metric("Total savings (week)", f"£{(week_fixed_gbp-week_dynamic_batt_gbp):,.0f}")
-c5.metric("Assumed peak usage", "300kW")
+c5.metric("Assumed yearly peak demand", "150kW")
 c6.metric("Battery size", "260kWh")
 
 st.divider()

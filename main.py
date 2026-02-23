@@ -212,7 +212,7 @@ def run_model(dataset_bad_name):
 def process_all_seasons():
     dfs = {}
 
-    load_profile = prepare_load_profile(peak_load=300)
+    load_profile = prepare_load_profile(peak_load=150)
 
     for season in Seasons:
         season_abr, mkt_px_dataset = season.value
