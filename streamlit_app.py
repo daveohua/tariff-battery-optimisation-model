@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import datetime
+import plotly.graph_objects as go
 from main import process_all_seasons
 
 st.set_page_config(page_title="SME Battery Savings Simulator", layout="wide")
@@ -49,7 +50,7 @@ if not dfs:
 season = st.sidebar.segmented_control(
     "Select season",
     ["Winter", "Spring", "Summer", "Autumn"],
-    default="Winter"
+    default="Winter",
 )
 df = add_time_labels(dfs[season.upper()])
 
@@ -60,7 +61,7 @@ day = st.sidebar.segmented_control(
 )
 df["SettlementDate"] = pd.to_datetime(df["SettlementDate"])
 day_df = df[df["SettlementDate"].dt.day_name() == day].copy()
-view3 = st.sidebar.segmented_control(
+plan = st.sidebar.segmented_control(
     "Select plan",
     ["Fixed", "Dynamic", "Dynamic+Battery"],
     default="Fixed"
@@ -98,7 +99,6 @@ st.divider()
 # ---------- Daily trace ----------
 st.subheader(f"Half-hourly consumption, typical {day} in {season.lower()}")
 
-# Build a compact trace table for charting
 trace = day_df[[
     "Time",
     "Usage_kW",
@@ -109,20 +109,82 @@ trace = day_df[[
     "SupplierImportPrice_p_kWh",
 ]].copy()
 
-# Convert discharge to negative for a single “battery power” line if desired
 trace["BatteryPower_kW"] = trace["Charge_kW"] - trace["Discharge_kW"]
+trace["fixedTariffPrice_p_kWh"] = 21
+trace["consumerPrice_p_kWh"] = trace["fixedTariffPrice_p_kWh"] if plan == "Fixed" else trace["SupplierImportPrice_p_kWh"]
 
-left, right = st.columns([2, 1])
+price_cols = [
+    "SupplierImportPrice_p_kWh",
+    "fixedTariffPrice_p_kWh"
+]
 
-st.bar_chart(
-    trace.set_index("Time")[["Usage_kW"]]
+y2_min = trace[price_cols].min().min()
+y2_max = trace[price_cols].max().max()
+
+padding = (y2_max - y2_min) * 0.05
+y2_range = [y2_min - padding, y2_max + padding]
+
+trace = trace.set_index("Time")
+
+# Create figure
+fig = go.Figure()
+
+# Usage bars (left axis)
+fig.add_trace(go.Bar(
+    x=trace.index,
+    y=trace["Usage_kW"],
+    name="Usage (kW)",
+    yaxis="y"
+))
+
+if plan == "Dynamic+Battery":
+    fig.add_trace(go.Bar(
+        x=trace.index,
+        y=trace["GridImport_kW"],
+        name="Grid Import (kW)",
+        yaxis="y"
+    ))
+
+
+# Price line (right axis)
+fig.add_trace(go.Scatter(
+    x=trace.index,
+    y=trace["consumerPrice_p_kWh"],
+    name="Price (p/kWh)",
+    mode="lines",
+    yaxis="y2"
+))
+
+if plan != "Fixed":
+    fig.add_trace(go.Scatter(
+        x=trace.index,
+        y=trace["fixedTariffPrice_p_kWh"],
+        name="Fixed tariff price (p/kWh)",
+        mode="lines",
+        yaxis="y2",
+        line=dict(dash="dash")
+    ))
+
+# Layout with dual axes
+fig.update_layout(
+    xaxis=dict(title="Time"),
+    yaxis=dict(title="Usage (kW)", showgrid=False),
+    yaxis2=dict(
+        title="Price (p/kWh)",
+        overlaying="y",
+        side="right",
+        range=y2_range,
+        showgrid=False
+    ),
+    legend=dict(orientation="h")
 )
+
+st.plotly_chart(fig, use_container_width=True)
 
 with st.expander("Show raw data"):
     st.dataframe(day_df, use_container_width=True)
 
 st.divider()
-
 # ---------- Assumptions ----------
 st.subheader("Assumptions")
 st.markdown(
