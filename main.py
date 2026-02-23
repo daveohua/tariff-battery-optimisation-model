@@ -213,8 +213,23 @@ def run_model(dataset_bad_name):
     return battery_state_df
 
 if __name__ == "__main__":
+    summary = []
+
     load_profile = prepare_load_profile()
-    mkt_prices = prepare_mkt_prices()
-    px_usage_sp = generate_usage_per_sp(load_profile, mkt_prices)
-    final_df = run_model(px_usage_sp)
+
+    for season in Seasons:
+        mkt_prices = prepare_mkt_prices(season.value[1])
+        px_usage_sp = generate_usage_per_sp(load_profile, mkt_prices, season.value[0])
+        final_df = run_model(px_usage_sp)
+
+        summary.append({
+            "season": season.name,
+            "fixed_tariff": final_df["NetCost_p"].sum() / 100 * 13,
+            "tou_tariff": final_df["WholesaleNoBatteryCost_p"].sum() / 100 * 13,
+            "tou_tariff_battery": final_df["TariffNoBatteryCost_p"].sum() / 100 * 13
+        })
+
+    summary_df = pd.DataFrame(summary)
+    print(summary_df)
+
     final_df.to_csv("temp/final_df.csv")
