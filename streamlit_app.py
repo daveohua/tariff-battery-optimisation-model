@@ -51,6 +51,12 @@ available_days = sorted(df["SettlementDate"].astype(str).unique())
 day = st.sidebar.selectbox("Day", available_days)
 day_df = df[df["SettlementDate"].astype(str) == day].copy()
 
+# compute year totals
+year_fixed_gbp = gbp(sum(df["TariffNoBatteryCost_p"].sum() * 13 for df in dfs.values()))
+year_dynamic_gbp = gbp(sum(df["WholesaleNoBatteryCost_p"].sum() * 13 for df in dfs.values()))
+year_dynamic_batt_gbp = gbp(sum(df["NetCost_p"].sum() * 13 for df in dfs.values()))
+
+
 # ---------- Compute weekly totals (for selected season) ----------
 # Assumes your *_Cost_p columns are per settlement period
 week_fixed_gbp = gbp(df["TariffNoBatteryCost_p"].sum())
@@ -59,15 +65,22 @@ week_dynamic_batt_gbp = gbp(df["NetCost_p"].sum())
 
 # ---------- Top KPIs ----------
 c1, c2, c3, c4, c5, c6 = st.columns(6)
-c1.metric("Fixed tariff (week)", f"£{week_fixed_gbp:,.0f}")
-c2.metric("Dynamic tariff (week)", f"£{week_dynamic_gbp:,.0f}", delta=f"£{(week_fixed_gbp-week_dynamic_gbp):,.0f}")
-c3.metric("Dynamic + battery (week)", f"£{week_dynamic_batt_gbp:,.0f}", delta=f"£{(week_dynamic_gbp-week_dynamic_batt_gbp):,.0f}")
-c4.metric("Total savings (week)", f"£{(week_fixed_gbp-week_dynamic_batt_gbp):,.0f}")
+c1.metric("Fixed tariff (year)", f"£{year_fixed_gbp:,.0f}")
+c2.metric("Dynamic tariff (year)", f"£{year_dynamic_gbp:,.0f}", delta=f"£{(year_fixed_gbp-year_dynamic_gbp):,.0f}")
+c3.metric("Dynamic + battery (year)", f"£{year_dynamic_batt_gbp:,.0f}", delta=f"£{(year_dynamic_gbp-year_dynamic_batt_gbp):,.0f}")
+c4.metric("Total savings (year)", f"£{(year_fixed_gbp-year_dynamic_batt_gbp):,.0f}")
 c5.metric("Assumed yearly peak demand", "150kW")
 c6.metric("Battery size", "260kWh")
 
 st.divider()
 
+c7, c8, c9, c10 = st.columns(4)
+c7.metric("Fixed tariff (week)", f"£{week_fixed_gbp:,.0f}")
+c8.metric("Dynamic tariff (week)", f"£{week_dynamic_gbp:,.0f}", delta=f"£{(week_fixed_gbp-week_dynamic_gbp):,.0f}")
+c9.metric("Dynamic + battery (week)", f"£{week_dynamic_batt_gbp:,.0f}", delta=f"£{(week_dynamic_gbp-week_dynamic_batt_gbp):,.0f}")
+c10.metric("Total savings (week)", f"£{(week_fixed_gbp-week_dynamic_batt_gbp):,.0f}")
+
+st.divider()
 # ---------- Daily trace ----------
 st.subheader(f"Daily behaviour ({season.title()} – {day})")
 
