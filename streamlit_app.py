@@ -4,7 +4,7 @@ import datetime
 import plotly.graph_objects as go
 from main import process_all_seasons
 
-st.set_page_config(page_title="SME Battery Savings Simulator", layout="wide")
+st.set_page_config(page_title="Battery Savings Simulator", layout="wide")
 
 # ---------- Helpers ----------
 def sp_to_time_str(sp: int) -> str:
@@ -84,7 +84,7 @@ c1.metric("Fixed tariff (year)", f"£{year_fixed_gbp:,.0f}")
 c2.metric("Dynamic tariff (year)", f"£{year_dynamic_gbp:,.0f}", delta=f"-£{(year_fixed_gbp-year_dynamic_gbp):,.0f}", delta_color="inverse")
 c3.metric("Dynamic + battery (year)", f"£{year_dynamic_batt_gbp:,.0f}", delta=f"-£{(year_fixed_gbp-year_dynamic_batt_gbp):,.0f}", delta_color="inverse")
 c4.metric("Total savings (year)", f"£{(year_fixed_gbp-year_dynamic_batt_gbp):,.0f}")
-c5.metric("Yearly peak demand", "150kW")
+c5.metric("Yearly peak site demand", "150kW")
 c6.metric("Battery size", "260kWh")
 
 st.divider()
@@ -194,15 +194,3 @@ st.plotly_chart(fig, use_container_width=True)
 
 with st.expander("Show raw data"):
     st.dataframe(day_df, use_container_width=True)
-
-st.divider()
-# ---------- Assumptions ----------
-st.subheader("Assumptions")
-st.markdown(
-    """
-- Battery: **260 kWh**, **100 kW** (charge/discharge), SOC min **10%**, round-trip eff. ~**90%**
-- Dynamic tariff: **MIP + adder** (import), export at **MIP**
-- Dispatch: **site-first discharge** (primarily avoids grid import), charge in low-price periods
-- Excludes: **local flexibility revenues**, capacity/ancillary services, degradation costs
-"""
-)
