@@ -209,6 +209,22 @@ def run_model(dataset_bad_name):
     battery_state_df = pd.DataFrame(battery_state)
     return battery_state_df
 
+def process_all_seasons():
+    dfs = {}
+
+    load_profile = prepare_load_profile(peak_load=300)
+
+    for season in Seasons:
+        season_abr, mkt_px_dataset = season.value
+
+        mkt_prices = prepare_mkt_prices(mkt_px_dataset)
+        px_usage_sp = generate_usage_per_sp(load_profile, mkt_prices, season_abr)
+        final_df = run_model(px_usage_sp)
+
+        dfs[season.name] = final_df
+
+    return dfs
+
 if __name__ == "__main__":
     summary = []
 
