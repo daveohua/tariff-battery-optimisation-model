@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import datetime
 from main import process_all_seasons
 
 st.set_page_config(page_title="SME Battery Savings Simulator", layout="wide")
@@ -44,13 +45,26 @@ if not dfs:
     st.stop()
 
 # ---------- Sidebar controls ----------
-season = st.sidebar.selectbox("Season", list(dfs.keys()))
-df = add_time_labels(dfs[season])
 
-available_days = sorted(df["SettlementDate"].astype(str).unique())
-day = st.sidebar.selectbox("Day", available_days)
-day_df = df[df["SettlementDate"].astype(str) == day].copy()
+season = st.sidebar.segmented_control(
+    "Select season",
+    ["Winter", "Spring", "Summer", "Autumn"],
+    default="Winter"
+)
+df = add_time_labels(dfs[season.upper()])
 
+day = st.sidebar.segmented_control(
+    "Select day",
+    ["Monday", "Saturday", "Sunday"],
+    default="Monday"
+)
+df["SettlementDate"] = pd.to_datetime(df["SettlementDate"])
+day_df = df[df["SettlementDate"].dt.day_name() == day].copy()
+view3 = st.sidebar.segmented_control(
+    "Select plan",
+    ["Fixed", "Dynamic", "Dynamic+Battery"],
+    default="Fixed"
+)
 # compute year totals
 year_fixed_gbp = gbp(sum(df["TariffNoBatteryCost_p"].sum() * 13 for df in dfs.values()))
 year_dynamic_gbp = gbp(sum(df["WholesaleNoBatteryCost_p"].sum() * 13 for df in dfs.values()))
@@ -82,7 +96,7 @@ c10.metric(f"Total savings (typical {season.lower()} week)", f"£{(week_fixed_gb
 
 st.divider()
 # ---------- Daily trace ----------
-st.subheader(f"Daily behaviour ({season.title()} – {day})")
+st.subheader(f"Half-hourly consumption, typical {day} in {season.lower()}")
 
 # Build a compact trace table for charting
 trace = day_df[[
@@ -100,8 +114,8 @@ trace["BatteryPower_kW"] = trace["Charge_kW"] - trace["Discharge_kW"]
 
 left, right = st.columns([2, 1])
 
-st.line_chart(
-    trace.set_index("Time")[["Usage_kW", "GridImport_kW", "BatteryPower_kW", "SupplierImportPrice_p_kWh"]]
+st.bar_chart(
+    trace.set_index("Time")[["Usage_kW"]]
 )
 
 with st.expander("Show raw data"):
