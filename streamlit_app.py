@@ -23,7 +23,7 @@ def gbp(x_pence: float) -> float:
     return x_pence / 100.0
 
 st.title("Battery Savings Simulator")
-st.caption("How much can you save when you switch from a fixed tariff to a dynamic tariff with battery optimisation?")
+st.caption("How much could you save when you switch from a fixed tariff to a dynamic tariff with battery optimisation? (For information purposes only)")
 
 # ---------- Sidebar controls ----------
 
@@ -31,7 +31,15 @@ fixed_tariff_px = st.sidebar.number_input(
     "Fixed tariff price (p/kWh)", value=21
 )
 
-dfs = process_all_seasons(fixed_tariff_px=fixed_tariff_px, peak_load=150)
+yearly_peak_site_demand = st.sidebar.number_input(
+    "Yearly peak site demand (kW)", value=150
+)
+
+battery_size = st.sidebar.number_input(
+    "Battery size (kWh)", value=260
+)
+
+dfs = process_all_seasons(fixed_tariff_px=fixed_tariff_px, peak_load=yearly_peak_site_demand, battery_size=battery_size)
 
 season = st.sidebar.segmented_control(
     "Select season",
@@ -70,8 +78,8 @@ c1.metric("Fixed tariff (year)", f"£{year_fixed_gbp:,.0f}")
 c2.metric("Dynamic tariff (year)", f"£{year_dynamic_gbp:,.0f}", delta=f"-£{(year_fixed_gbp-year_dynamic_gbp):,.0f}", delta_color="inverse")
 c3.metric("Dynamic + battery (year)", f"£{year_dynamic_batt_gbp:,.0f}", delta=f"-£{(year_fixed_gbp-year_dynamic_batt_gbp):,.0f}", delta_color="inverse")
 c4.metric("Total savings (year)", f"£{(year_fixed_gbp-year_dynamic_batt_gbp):,.0f}")
-c5.metric("Yearly peak site demand", "150kW")
-c6.metric("Battery size", "260kWh")
+c5.metric("Yearly peak site demand", f"{yearly_peak_site_demand}kW")
+c6.metric("Battery size", f"{battery_size}kWh")
 
 st.divider()
 
