@@ -25,10 +25,6 @@ def gbp(x_pence: float) -> float:
 st.title("Battery Savings Simulator")
 st.caption("How much can you save when you switch from a fixed tariff to a dynamic tariff with battery optimisation?")
 
-if not dfs:
-    st.warning("Hook up your seasonal results dataframes (winter/spring/summer/autumn) in the `dfs` dict.")
-    st.stop()
-
 # ---------- Sidebar controls ----------
 
 fixed_tariff_px = st.sidebar.number_input(
