@@ -107,9 +107,27 @@ trace = day_df[[
     "SupplierImportPrice_p_kWh",
 ]].copy()
 
+trace = trace.set_index("Time")
+
 trace["BatteryPower_kW"] = trace["Charge_kW"] - trace["Discharge_kW"]
 trace["fixedTariffPrice_p_kWh"] = fixed_tariff_px
 trace["consumerPrice_p_kWh"] = trace["fixedTariffPrice_p_kWh"] if plan == "Fixed" else trace["SupplierImportPrice_p_kWh"]
+
+
+def truth_intervals(mask):
+    groups = mask.ne(mask.shift()).cumsum()
+    sessions = (
+        trace[mask]
+        .groupby(groups[mask])
+        .apply(lambda x: (x.index[0], x.index[-1]))
+    )
+    if sessions.empty:
+        return []
+    return sessions.to_list()
+
+charging_ranges = truth_intervals(trace["Charge_kW"] > 0)
+discharging_ranges = truth_intervals(trace["Discharge_kW"] > 0)
+
 
 price_cols = [
     "SupplierImportPrice_p_kWh",
@@ -133,7 +151,6 @@ y_max = trace[consumption_cols].max().max()
 padding = (y_max - y_min) * 0.05
 y_range = [y_min - padding, y_max + padding]
 
-trace = trace.set_index("Time")
 
 # Create figure
 fig = go.Figure()
@@ -187,6 +204,29 @@ fig.update_layout(
     ),
     legend=dict(orientation="h")
 )
+
+def add_shading(intervals, color, layer="below"):
+    shapes = []
+    for x0, x1 in intervals:
+        shapes.append(dict(
+            type="rect",
+            xref="x",
+            yref="paper",   # paper => 0..1, covers the whole plot height
+            x0=x0,
+            x1=x1,
+            y0=0,
+            y1=1,
+            fillcolor=color,
+            line=dict(width=0),
+            layer=layer,
+        ))
+    return shapes
+
+if plan == "Dynamic+Battery":
+    shading_areas = []
+    shading_areas += add_shading(charging_ranges, color="rgba(0, 255, 0, 0.15)")
+    shading_areas += add_shading(discharging_ranges, color="rgba(0, 0, 255, 0.15)")
+    fig.update_layout(shapes=shading_areas)
 
 st.plotly_chart(fig, use_container_width=True)
 
