@@ -188,3 +188,10 @@ st.plotly_chart(fig, use_container_width=True)
 
 with st.expander("Show raw data"):
     st.dataframe(day_df, use_container_width=True)
+
+st.subheader("Notes and Assumptions")
+st.markdown(""" 
+    - This dashboard is powered by a model that models the electricity demand and battery usage of a single site, for an indicative week in each season. These are extrapolated to produce yearly figures.
+    - The modelled demand pattern is based on Elexon Load Profile 5, which most closely matches businesses with maximum demand above 100kW who have high demand peaks as opposed to sustained demand. 
+    - The model for the dynamic tariff with battery optimisation focusses on tariff arbitrage with site-first dispatch. Notably it does not take into account distribution network costs. More savings could be made from exporting electricity to wholesale markets, further demand shaving to avoid distribution network costs, and revenue gained from participation in flexibility and capacity markets.
+""")
