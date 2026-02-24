@@ -212,7 +212,7 @@ def add_shading(intervals, color, layer="below"):
             type="rect",
             xref="x",
             yref="paper",   # paper => 0..1, covers the whole plot height
-            x0=x0,
+            x0=x0, #BUG: need padding here some how otherwise 1-sp discharges don't show
             x1=x1,
             y0=0,
             y1=1,
