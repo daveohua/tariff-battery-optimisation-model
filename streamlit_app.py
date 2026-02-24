@@ -19,24 +19,8 @@ def add_time_labels(df: pd.DataFrame) -> pd.DataFrame:
     out["Time"] = out["SettlementPeriod"].astype(int).map(sp_to_time_str)
     return out
 
-def annualise_from_4_weeks(season_weeks_gbp: dict) -> float:
-    # dict like {"winter": 50080, "spring": 35294, ...} in £ per representative week
-    return 13 * sum(season_weeks_gbp.values())
-
 def gbp(x_pence: float) -> float:
     return x_pence / 100.0
-
-# ---------- Load data ----------
-# Replace this with however you store your seasonal results.
-# Expect a dict: season -> df_results (one week of 48*7 rows)
-# Example:
-# dfs = {
-#   "winter": pd.read_parquet("winter.parquet"),
-#   "spring": pd.read_parquet("spring.parquet"),
-#   "summer": pd.read_parquet("summer.parquet"),
-#   "autumn": pd.read_parquet("autumn.parquet"),
-# }
-dfs = process_all_seasons()
 
 st.title("Battery Savings Simulator")
 st.caption("How much can you save when you switch from a fixed tariff to a dynamic tariff with battery optimisation?")
@@ -50,6 +34,8 @@ if not dfs:
 fixed_tariff_px = st.sidebar.number_input(
     "Fixed tariff price (p/kWh)", value=21
 )
+
+dfs = process_all_seasons(fixed_tariff_px=fixed_tariff_px, peak_load=150)
 
 season = st.sidebar.segmented_control(
     "Select season",
