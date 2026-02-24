@@ -127,15 +127,15 @@ def generate_usage_per_sp(load_profile, mkt_prices, _season):
 
     return usage_sp
 
-def run_model(dataset_bad_name):
+def run_model(dataset, fixed_tariff_px):
     battery = Battery()
     battery_state = []
 
-    FIXED_TARIFF_p = 21
+    FIXED_TARIFF_p = fixed_tariff_px
     WHOLESALE_SUPPLIER_PREMIUM_p = 10
     SETTLEMENT_PERIOD_LENGTH_h = 0.5
 
-    for index, row in dataset_bad_name.iterrows():
+    for index, row in dataset.iterrows():
         charge_kW = 0
         discharge_kW = 0
 
@@ -209,7 +209,7 @@ def run_model(dataset_bad_name):
     battery_state_df = pd.DataFrame(battery_state)
     return battery_state_df
 
-def process_all_seasons(peak_load=150):
+def process_all_seasons(fixed_tariff_px=21, peak_load=150):
     dfs = {}
 
     load_profile = prepare_load_profile(peak_load)
@@ -219,7 +219,7 @@ def process_all_seasons(peak_load=150):
 
         mkt_prices = prepare_mkt_prices(mkt_px_dataset)
         px_usage_sp = generate_usage_per_sp(load_profile, mkt_prices, season_abr)
-        final_df = run_model(px_usage_sp)
+        final_df = run_model(px_usage_sp, fixed_tariff_px)
 
         dfs[season.name] = final_df
 
