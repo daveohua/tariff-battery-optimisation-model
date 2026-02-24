@@ -47,6 +47,10 @@ if not dfs:
 
 # ---------- Sidebar controls ----------
 
+fixed_tariff_px = st.sidebar.number_input(
+    "Fixed tariff price (p/kWh)", value=21
+)
+
 season = st.sidebar.segmented_control(
     "Select season",
     ["Winter", "Spring", "Summer", "Autumn"],
@@ -110,7 +114,7 @@ trace = day_df[[
 ]].copy()
 
 trace["BatteryPower_kW"] = trace["Charge_kW"] - trace["Discharge_kW"]
-trace["fixedTariffPrice_p_kWh"] = 21
+trace["fixedTariffPrice_p_kWh"] = fixed_tariff_px
 trace["consumerPrice_p_kWh"] = trace["fixedTariffPrice_p_kWh"] if plan == "Fixed" else trace["SupplierImportPrice_p_kWh"]
 
 price_cols = [
