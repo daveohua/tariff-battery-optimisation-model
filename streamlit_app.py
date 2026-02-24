@@ -61,16 +61,16 @@ plan = st.sidebar.segmented_control(
     default="Fixed"
 )
 # compute year totals
-year_fixed_gbp = gbp(sum(df["TariffNoBatteryCost_p"].sum() * 13 for df in dfs.values()))
-year_dynamic_gbp = gbp(sum(df["WholesaleNoBatteryCost_p"].sum() * 13 for df in dfs.values()))
-year_dynamic_batt_gbp = gbp(sum(df["NetCost_p"].sum() * 13 for df in dfs.values()))
+year_fixed_gbp = gbp(sum(df["FixedTariffCost_p"].sum() * 13 for df in dfs.values()))
+year_dynamic_gbp = gbp(sum(df["DynamicTariffNoBatteryCost_p"].sum() * 13 for df in dfs.values()))
+year_dynamic_batt_gbp = gbp(sum(df["DynamicTariffBatteryCost_p"].sum() * 13 for df in dfs.values()))
 
 
 # ---------- Compute weekly totals (for selected season) ----------
 # Assumes your *_Cost_p columns are per settlement period
-week_fixed_gbp = gbp(df["TariffNoBatteryCost_p"].sum())
-week_dynamic_gbp = gbp(df["WholesaleNoBatteryCost_p"].sum())
-week_dynamic_batt_gbp = gbp(df["NetCost_p"].sum())
+week_fixed_gbp = gbp(df["FixedTariffCost_p"].sum())
+week_dynamic_gbp = gbp(df["DynamicTariffNoBatteryCost_p"].sum())
+week_dynamic_batt_gbp = gbp(df["DynamicTariffBatteryCost_p"].sum())
 
 # ---------- Top KPIs ----------
 c1, c2, c3, c4, c5, c6 = st.columns(6)

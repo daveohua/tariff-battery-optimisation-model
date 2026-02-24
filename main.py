@@ -196,8 +196,8 @@ def run_model(dataset, fixed_tariff_px, battery_size):
                 "Charge_kW": charge_kW,
                 "Discharge_kW": discharge_kW,
                 "SOC_kWh": battery.soc_kWh,
-                "BatteryAction": action,
-                "BatteryActionReason": reason,
+                "ProposedBatteryAction": action,
+                "ProposedBatteryActionReason": reason,
                 # Grid interaction
                 "GridNet_kW": grid_net_kW,
                 "GridImport_kW": grid_import_kW,
@@ -205,9 +205,9 @@ def run_model(dataset, fixed_tariff_px, battery_size):
                 # Economics
                 "ImportCost_p": import_cost_p,
                 "ExportRevenue_p": export_revenue_p,
-                "NetCost_p": net_cost_p,
-                "WholesaleNoBatteryCost_p": wholesale_baseline_cost_p,
-                "TariffNoBatteryCost_p": tariff_baseline_cost_p,
+                "DynamicTariffBatteryCost_p": net_cost_p,
+                "DynamicTariffNoBatteryCost_p": wholesale_baseline_cost_p,
+                "FixedTariffCost_p": tariff_baseline_cost_p,
             }
         )
 
@@ -244,9 +244,9 @@ if __name__ == "__main__":
 
         summary.append({
             "season": season.name,
-            "tou_tariff_battery": final_df["NetCost_p"].sum() / 100 * 13,
-            "tou_tariff": final_df["WholesaleNoBatteryCost_p"].sum() / 100 * 13,
-            "fixed_tariff": final_df["TariffNoBatteryCost_p"].sum() / 100 * 13
+            "tou_tariff_battery": final_df["DynamicTariffBatteryCost_p"].sum() / 100 * 13,
+            "tou_tariff": final_df["DynamicTariffNoBatteryCost_p"].sum() / 100 * 13,
+            "fixed_tariff": final_df["FixedTariffNoBatteryCost_p"].sum() / 100 * 13
         })
 
     summary_df = pd.DataFrame(summary)
