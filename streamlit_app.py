@@ -26,6 +26,7 @@ st.title("Flexibility-native Electricity Savings Simulator")
 st.caption("How much could you save when you switch from a fixed tariff to a dynamic tariff with battery optimisation? (For information purposes only)")
 
 # ---------- Sidebar controls ----------
+st.sidebar.subheader("Your site")
 
 fixed_tariff_px = st.sidebar.number_input(
     "Fixed tariff price (p/kWh)", value=21
@@ -40,6 +41,8 @@ battery_size = st.sidebar.number_input(
 )
 
 dfs = process_all_seasons(fixed_tariff_px=fixed_tariff_px, peak_load=yearly_peak_site_demand, battery_size=battery_size)
+
+st.sidebar.subheader("Scenarios")
 
 season = st.sidebar.segmented_control(
     "Select season",
