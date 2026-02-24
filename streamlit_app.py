@@ -192,6 +192,7 @@ with st.expander("Show raw data"):
 st.subheader("Notes and Assumptions")
 st.markdown(""" 
     - This dashboard is powered by a model that models the electricity demand and battery usage of a single site, for an indicative week in each season. These are extrapolated to produce yearly figures.
+    - Electricity prices for the dynamic tariff track Elexon Market Index Prices for the settlement periods the model is ran on, with a premium representing the supplier's margin.
     - The battery optimisation model is a very simple rule based system. Optimisation models in real life are very sophisticated and will produce better savings.
     - The modelled demand pattern is based on Elexon Load Profile 5, which most closely matches businesses with maximum demand above 100kW who have high demand peaks as opposed to sustained demand. 
     - The model for the dynamic tariff with battery optimisation focusses on tariff arbitrage with site-first dispatch. Notably it does not take into account distribution network costs. More savings could be made from exporting electricity to wholesale markets, further demand shaving to avoid distribution network costs, and revenue gained from participation in flexibility and capacity markets.
