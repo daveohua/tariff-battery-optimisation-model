@@ -1,7 +1,6 @@
 [project]
 name = "tariff-battery-optimisation-model"
 version = "0.1.0"
-packages = [{ include = "tariff_battery_optimisation_model" }]
 description = "tariff battery optimisation model + streamlit dashboard"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -11,3 +10,8 @@ dependencies = [
     "plotly>=6.5.2",
     "streamlit>=1.30.0",
 ]
+
+[tool.poetry]
+name = "tariff-battery-optimisation-model"
+version = "0.1.0"
+package-mode = false
