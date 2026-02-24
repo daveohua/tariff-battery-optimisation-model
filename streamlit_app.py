@@ -73,13 +73,14 @@ week_dynamic_gbp = gbp(df["DynamicTariffNoBatteryCost_p"].sum())
 week_dynamic_batt_gbp = gbp(df["DynamicTariffBatteryCost_p"].sum())
 
 # ---------- Top KPIs ----------
-c1, c2, c3, c4, c5, c6 = st.columns(6)
-c1.metric("Fixed tariff (year)", f"£{year_fixed_gbp:,.0f}")
+c7, c5, c6, c1, c2, c3, c4 = st.columns(7)
+c7.metric("Fixed tariff price", f"{fixed_tariff_px}p/kWh")
+c5.metric("Yearly peak site demand", f"{yearly_peak_site_demand}kW")
+c6.metric("Battery size", f"{battery_size}kWh")
+c1.metric("Fixed tariff cost (year)", f"£{year_fixed_gbp:,.0f}")
 c2.metric("Dynamic tariff (year)", f"£{year_dynamic_gbp:,.0f}", delta=f"-£{(year_fixed_gbp-year_dynamic_gbp):,.0f}", delta_color="inverse")
 c3.metric("Dynamic + battery (year)", f"£{year_dynamic_batt_gbp:,.0f}", delta=f"-£{(year_fixed_gbp-year_dynamic_batt_gbp):,.0f}", delta_color="inverse")
 c4.metric("Total savings (year)", f"£{(year_fixed_gbp-year_dynamic_batt_gbp):,.0f}")
-c5.metric("Yearly peak site demand", f"{yearly_peak_site_demand}kW")
-c6.metric("Battery size", f"{battery_size}kWh")
 
 st.divider()
 
