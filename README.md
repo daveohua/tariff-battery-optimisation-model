@@ -6,4 +6,4 @@ Three scenarios are modelled:
 
 ## Things this model doesn't include
 - Revenue from participation in flexibility and capacity markets
-- Consideration for DUoS (expand on this)
+- Disribution network charges, which incentivise shifting load to less busy times
